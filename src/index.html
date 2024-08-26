@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>green api</title>
+    <style>
+        .block {
+            display: flex;
+            flex-direction: row;
+            padding: 36px;
+            gap: 32px;
+        }
+        .buttonMain {
+            width: auto;
+            height: 36px;
+        }
+        .inputArea {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .spaceBetweenBlock {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .textArea {
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <!-- .field {clear:both; text-align:right;}
+    label {float:left;} -->
+    <div class="block">
+    <div class="inputArea">
+        <div class="spaceBetweenBlock">
+            <input type="text" id="idInstance" placeholder="idInstance"><br>
+            <input type="text" id="apiTokenInstance" placeholder="apiTokenInstance"><br>    
+        </div>
+        <div class="spaceBetweenBlock">
+            <button class="buttonMain" id="getSettings">getSettings</button><div></div>
+            <button class="buttonMain" id="getStateInstance">getStateInstance</button><div></div>
+        
+        </div>
+    
+        <div class="spaceBetweenBlock">
+            <input type="tel" id="chatId" placeholder="Номер телефона или чата (без знаков)"><br>
+            <textarea id="message" placeholder="Текст сообщения"></textarea><br>
+            <button class="buttonMain" onclick="sendMessage()">sendMessage</button><div></div>    
+        </div>
+    
+        <div class="spaceBetweenBlock">
+            <input type="tel" id="chatId" placeholder="Номер телефона или чата (без знаков)"><br>
+            <input type="text" id="urlFile" placeholder="Ссылка на файл"><br>
+            <input type="text" id="fileName" placeholder="Название файла"><br>
+            <button class="buttonMain" id="sendFileByUrl">sendFileByUrl</button><div></div>    
+        </div>    
+    </div>
+    <div>
+        <label>Ответ:</label><br>
+        <textarea class="textArea" id="responseMessage" placeholder="Текст"></textarea><br>
+    </div>
+    </div>
+<script>
+    async function callApi(endpoint, method = 'POST', body = {}) {
+        const response = await fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        const data = await response.json()
+        return data
+    }
+
+
+    async function callApiGet(endpoint, method = 'GET') {
+        const response = await fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+        })
+        const data = await response.json()
+        return data
+    }
+
+    document.getElementById('getSettings').addEventListener('click', async () => {
+        const idInstance = document.getElementById('idInstance').value;
+        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+        const result = await callApiGet(`http://localhost:3000/${idInstance}/getSettings/${apiTokenInstance}`)
+        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2)
+    })
+    document.getElementById('getStateInstance').addEventListener('click', async () => {
+        const idInstance = document.getElementById('idInstance').value;
+        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+        const result = await callApiGet(`/http://localhost:3000/${idInstance}/getStateInstance/${apiTokenInstance}`)
+        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
+    })
+    document.getElementById('sendMessage').addEventListener('click', async () => {
+        const idInstance = document.getElementById('idInstance').value;
+        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+        const chatId = prompt("Номер телефона (чата):")
+        const message = prompt("Сообщение:")
+        const result = await callApi(`http://localhost:3000/${idInstance}/sendMessage/${apiTokenInstance}`, 'POST', { chatId, message })
+        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
+    })
+    document.getElementById('sendFileByUrl').addEventListener('click', async () => {
+        const idInstance = document.getElementById('idInstance').value;
+        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+        const chatId = prompt("Номер телефона (чата):")
+        const url = prompt("URL:")
+        const result = await callApi(`http://localhost:3000/${idInstance}/sendFileByUrl/${apiTokenInstance}`, 'POST', { chatId, url, fileName })
+        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
+    })
+</script>
+
+</body>
+</html>
