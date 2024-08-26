@@ -50,7 +50,7 @@
         <div class="spaceBetweenBlock">
             <input type="tel" id="chatId" placeholder="Номер телефона или чата (без знаков)"><br>
             <textarea id="message" placeholder="Текст сообщения"></textarea><br>
-            <button class="buttonMain" onclick="sendMessage()">sendMessage</button><div></div>    
+            <button class="buttonMain" id="sendMessage">sendMessage</button><div></div>    
         </div>
     
         <div class="spaceBetweenBlock">
@@ -101,16 +101,17 @@
     document.getElementById('sendMessage').addEventListener('click', async () => {
         const idInstance = document.getElementById('idInstance').value;
         const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const chatId = prompt("Номер телефона (чата):")
-        const message = prompt("Сообщение:")
+        const chatId = document.getElementById('chatId').value
+        const message = document.getElementById('message').value
         const result = await callApi(`http://localhost:3000/${idInstance}/sendMessage/${apiTokenInstance}`, 'POST', { chatId, message })
         document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
     })
     document.getElementById('sendFileByUrl').addEventListener('click', async () => {
         const idInstance = document.getElementById('idInstance').value;
         const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const chatId = prompt("Номер телефона (чата):")
-        const url = prompt("URL:")
+        const chatId = document.getElementById('chatId').value
+        const url = document.getElementById('urlFile').value
+        const fileName = document.getElementById('fileName').value
         const result = await callApi(`http://localhost:3000/${idInstance}/sendFileByUrl/${apiTokenInstance}`, 'POST', { chatId, url, fileName })
         document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
     })
