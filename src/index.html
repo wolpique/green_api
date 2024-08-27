@@ -33,8 +33,6 @@
     </style>
 </head>
 <body>
-    <!-- .field {clear:both; text-align:right;}
-    label {float:left;} -->
     <div class="block">
     <div class="inputArea">
         <div class="spaceBetweenBlock">
@@ -54,7 +52,7 @@
         </div>
     
         <div class="spaceBetweenBlock">
-            <input type="tel" id="chatId" placeholder="Номер телефона или чата (без знаков)"><br>
+            <input type="tel" id="chat_Id" placeholder="Номер телефона или чата (без знаков)"><br>
             <input type="text" id="urlFile" placeholder="Ссылка на файл"><br>
             <input type="text" id="fileName" placeholder="Название файла"><br>
             <button class="buttonMain" id="sendFileByUrl">sendFileByUrl</button><div></div>    
@@ -66,6 +64,20 @@
     </div>
     </div>
 <script>
+     function saveValue(id) {
+        localStorage.setItem(id, document.getElementById(id).value)
+    }
+
+    function loadValue(id) {
+        if (localStorage.getItem(id)) {
+            document.getElementById(id).value = localStorage.getItem(id)
+        }
+    }
+    document.querySelectorAll('input, textarea').forEach(input => {
+        loadValue(input.id);
+        input.addEventListener('input', () => saveValue(input.id));
+    })
+
     async function callApi(endpoint, method = 'POST', body = {}) {
         const response = await fetch(endpoint, {
             method: method,
@@ -86,36 +98,32 @@
         return data
     }
 
-    document.getElementById('getSettings').addEventListener('click', async () => {
-        const idInstance = document.getElementById('idInstance').value;
-        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const result = await callApiGet(`http://localhost:3000/${idInstance}/getSettings/${apiTokenInstance}`)
-        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2)
-    })
-    document.getElementById('getStateInstance').addEventListener('click', async () => {
-        const idInstance = document.getElementById('idInstance').value;
-        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const result = await callApiGet(`/http://localhost:3000/${idInstance}/getStateInstance/${apiTokenInstance}`)
-        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
-    })
-    document.getElementById('sendMessage').addEventListener('click', async () => {
-        const idInstance = document.getElementById('idInstance').value;
-        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const chatId = document.getElementById('chatId').value
-        const message = document.getElementById('message').value
-        const result = await callApi(`http://localhost:3000/${idInstance}/sendMessage/${apiTokenInstance}`, 'POST', { chatId, message })
-        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
-    })
-    document.getElementById('sendFileByUrl').addEventListener('click', async () => {
-        const idInstance = document.getElementById('idInstance').value;
-        const apiTokenInstance = document.getElementById('apiTokenInstance').value;
-        const chatId = document.getElementById('chatId').value
-        const url = document.getElementById('urlFile').value
-        const fileName = document.getElementById('fileName').value
-        const result = await callApi(`http://localhost:3000/${idInstance}/sendFileByUrl/${apiTokenInstance}`, 'POST', { chatId, url, fileName })
-        document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
-    })
-</script>
+    document.querySelectorAll('.buttonMain').forEach(button => {
+        button.addEventListener('click', async () => {
+            const idInstance = document.getElementById('idInstance').value;
+            const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+            let result
 
-</body>
-</html>
+            switch(button.id) {
+                case 'getSettings':
+                    result = await callApiGet(`http://localhost:3000/${idInstance}/getSettings/${apiTokenInstance}`)
+                    break
+                case 'getStateInstance':
+                    result = await callApiGet(`http://localhost:3000/${idInstance}/getStateInstance/${apiTokenInstance}`);
+                    break;
+                case 'sendMessage':
+                    const chatId = document.getElementById('chatId').value;
+                    const message = document.getElementById('message').value;
+                    result = await callApi(`http://localhost:3000/${idInstance}/sendMessage/${apiTokenInstance}`,'POST', { chatId, message });
+                    break;
+                case 'sendFileByUrl':
+                    const chat_Id = document.getElementById('chat_Id').value;
+                    const urlFile = document.getElementById('urlFile').value;
+                    const fileName = document.getElementById('fileName').value;
+                    result = await callApi(`http://localhost:3000/${idInstance}/sendFileByUrl/${apiTokenInstance}`,'POST', { chatId: chat_Id, urlFile, fileName });
+                    break;
+            }
+            
+            document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
+        })
+    })
