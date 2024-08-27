@@ -87,8 +87,6 @@
         const data = await response.json()
         return data
     }
-
-
     async function callApiGet(endpoint, method = 'GET') {
         const response = await fetch(endpoint, {
             method: method,
@@ -127,3 +125,7 @@
             document.getElementById('responseMessage').value = JSON.stringify(result, null, 2);
         })
     })
+
+</script>
+</body>
+</html>
